@@ -1,0 +1,98 @@
+import { Component, inject, input, output, computed } from '@angular/core';
+import { TableModule } from 'primeng/table';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TagModule } from 'primeng/tag';
+import { FormsModule } from '@angular/forms';
+import { ContentService } from '../../../../services/content.service';
+import { DependencyService, RoleSelection } from '../../../../services/dependency.service';
+
+@Component({
+  selector: 'app-report-tab',
+  imports: [TableModule, CheckboxModule, TagModule, FormsModule],
+  template: `
+    <p-table [value]="reportRows()" [tableStyle]="{ 'min-width': '40rem' }"
+             styleClass="p-datatable-sm">
+      <ng-template #header>
+        <tr>
+          <th style="width: 3rem"></th>
+          <th>Report</th>
+          <th>Description</th>
+          <th>View</th>
+          <th>Fields</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        <tr>
+          <td>
+            <p-checkbox [binary]="true" [ngModel]="row.selected"
+                        (ngModelChange)="toggleReport(row.id, $event)" />
+          </td>
+          <td class="font-medium">{{ row.name }}</td>
+          <td class="text-gray-600 text-sm">{{ row.description }}</td>
+          <td>
+            <span class="text-sm">{{ row.viewName }}</span>
+            @if (row.selected && !row.viewIncluded) {
+              <i class="pi pi-exclamation-triangle text-amber-500 ml-1" title="View not included"></i>
+            }
+          </td>
+          <td class="text-sm">{{ row.fieldCount }} fields ({{ row.missingFieldCount }} missing)</td>
+          <td>
+            @if (row.selected) {
+              @if (row.fullyVisible) {
+                <p-tag value="Visible" severity="success" icon="pi pi-check" />
+              } @else {
+                <p-tag value="Incomplete" severity="warn" icon="pi pi-exclamation-triangle" />
+              }
+            } @else {
+              <p-tag value="Not Included" severity="secondary" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  `,
+})
+export class ReportTabComponent {
+  private contentService = inject(ContentService);
+  private dependencyService = inject(DependencyService);
+
+  selectedIds = input<string[]>([]);
+  roleSelection = input<RoleSelection>({ dashboardIds: [], reportIds: [], viewIds: [], fieldIds: [] });
+  selectionChange = output<{ ids: string[]; added?: string; removed?: string }>();
+
+  reportRows = computed(() => {
+    const reports = this.contentService.getReports();
+    const selected = this.selectedIds();
+    const sel = this.roleSelection();
+
+    return reports.map(r => {
+      const isSelected = selected.includes(r.id);
+      const viewIncluded = sel.viewIds.includes(r.viewId);
+      const view = this.contentService.getView(r.viewId);
+      const missingFields = r.fieldIds.filter(fId => !sel.fieldIds.includes(fId));
+      const fullyVisible = isSelected && viewIncluded && missingFields.length === 0;
+
+      return {
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        viewName: view?.name ?? r.viewId,
+        viewIncluded,
+        fieldCount: r.fieldIds.length,
+        missingFieldCount: isSelected ? missingFields.length : 0,
+        selected: isSelected,
+        fullyVisible,
+      };
+    });
+  });
+
+  toggleReport(id: string, checked: boolean): void {
+    const current = this.selectedIds();
+    if (checked) {
+      this.selectionChange.emit({ ids: [...current, id], added: id });
+    } else {
+      this.selectionChange.emit({ ids: current.filter(i => i !== id), removed: id });
+    }
+  }
+}
