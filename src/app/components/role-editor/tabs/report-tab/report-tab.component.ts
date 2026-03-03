@@ -28,7 +28,7 @@ import { DependencyService, RoleSelection } from '../../../../services/dependenc
           <th style="width: 3rem"></th>
           <th>Report</th>
           <th>Type</th>
-          <th>Company</th>
+          <th>Created on</th>
           <th>Description</th>
           <th>View</th>
           <th>Fields</th>
