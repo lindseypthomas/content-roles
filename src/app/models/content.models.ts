@@ -12,6 +12,7 @@ export interface Report {
   viewId: string;
   fieldIds: string[];
   type: 'Metric Report' | 'Metric Tile' | 'Heatmap' | 'Report';
+  company: string;
 }
 
 export interface View {

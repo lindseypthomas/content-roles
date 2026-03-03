@@ -28,6 +28,7 @@ import { DependencyService, RoleSelection } from '../../../../services/dependenc
           <th style="width: 3rem"></th>
           <th>Report</th>
           <th>Type</th>
+          <th>Company</th>
           <th>Description</th>
           <th>View</th>
           <th>Fields</th>
@@ -44,6 +45,7 @@ import { DependencyService, RoleSelection } from '../../../../services/dependenc
           <td>
             <p-tag [value]="row.type" [severity]="getTypeSeverity(row.type)" />
           </td>
+          <td class="text-sm">{{ row.company }}</td>
           <td class="text-gray-600 text-sm">{{ row.description }}</td>
           <td>
             <span class="text-sm">{{ row.viewName }}</span>
@@ -102,6 +104,7 @@ export class ReportTabComponent {
         name: r.name,
         description: r.description,
         type: r.type || 'Report',
+        company: r.company || 'Unknown',
         viewName: view?.name ?? r.viewId,
         viewIncluded,
         fieldCount: r.fieldIds.length,

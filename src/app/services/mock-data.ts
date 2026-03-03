@@ -35,16 +35,16 @@ export const MOCK_VIEWS: View[] = [
 
 // ── Reports (10) ─────────────────────────────────────────────
 export const MOCK_REPORTS: Report[] = [
-  { id: 'r1',  name: 'Headcount Summary',           description: 'Current headcount by department and location',     viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f6', 'f8'], type: 'Metric Report' },
-  { id: 'r2',  name: 'New Hire Report',              description: 'Recent hires within selected period',             viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f4', 'f5', 'f7'], type: 'Report' },
-  { id: 'r3',  name: 'Termination Report',           description: 'Employee terminations and reasons',              viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'], type: 'Report' },
-  { id: 'r4',  name: 'Compensation Overview',        description: 'Salary distribution across the organization',     viewId: 'v2', fieldIds: ['f1', 'f2', 'f3', 'f9', 'f10', 'f11'], type: 'Heatmap' },
-  { id: 'r5',  name: 'Salary Band Analysis',         description: 'Pay grade distribution and outliers',            viewId: 'v2', fieldIds: ['f2', 'f3', 'f4', 'f9', 'f11', 'f12'], type: 'Metric Tile' },
-  { id: 'r6',  name: 'Absence Detail Report',        description: 'Detailed absence records by employee',           viewId: 'v3', fieldIds: ['f1', 'f2', 'f13', 'f14', 'f15', 'f16'], type: 'Report' },
-  { id: 'r7',  name: 'Absence Summary',              description: 'Absence hours aggregated by type and department', viewId: 'v3', fieldIds: ['f2', 'f3', 'f13', 'f16'], type: 'Metric Report' },
-  { id: 'r8',  name: 'Performance Ratings',          description: 'Performance review scores by department',        viewId: 'v4', fieldIds: ['f2', 'f3', 'f17', 'f18'], type: 'Heatmap' },
-  { id: 'r9',  name: 'Goal Completion Report',       description: 'Goal achievement rates across teams',            viewId: 'v4', fieldIds: ['f2', 'f7', 'f17', 'f19'], type: 'Metric Report' },
-  { id: 'r10', name: 'Talent Assessment Matrix',     description: 'Performance vs potential 9-box grid',            viewId: 'v4', fieldIds: ['f2', 'f3', 'f17', 'f20'], type: 'Heatmap' },
+  { id: 'r1',  name: 'Headcount Summary',           description: 'Current headcount by department and location',     viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f6', 'f8'], type: 'Metric Report', company: 'Acme Corp' },
+  { id: 'r2',  name: 'New Hire Report',              description: 'Recent hires within selected period',             viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f4', 'f5', 'f7'], type: 'Report', company: 'Acme Corp' },
+  { id: 'r3',  name: 'Termination Report',           description: 'Employee terminations and reasons',              viewId: 'v1', fieldIds: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'], type: 'Report', company: 'Tech Solutions' },
+  { id: 'r4',  name: 'Compensation Overview',        description: 'Salary distribution across the organization',     viewId: 'v2', fieldIds: ['f1', 'f2', 'f3', 'f9', 'f10', 'f11'], type: 'Heatmap', company: 'Global Industries' },
+  { id: 'r5',  name: 'Salary Band Analysis',         description: 'Pay grade distribution and outliers',            viewId: 'v2', fieldIds: ['f2', 'f3', 'f4', 'f9', 'f11', 'f12'], type: 'Metric Tile', company: 'Global Industries' },
+  { id: 'r6',  name: 'Absence Detail Report',        description: 'Detailed absence records by employee',           viewId: 'v3', fieldIds: ['f1', 'f2', 'f13', 'f14', 'f15', 'f16'], type: 'Report', company: 'Tech Solutions' },
+  { id: 'r7',  name: 'Absence Summary',              description: 'Absence hours aggregated by type and department', viewId: 'v3', fieldIds: ['f2', 'f3', 'f13', 'f16'], type: 'Metric Report', company: 'Acme Corp' },
+  { id: 'r8',  name: 'Performance Ratings',          description: 'Performance review scores by department',        viewId: 'v4', fieldIds: ['f2', 'f3', 'f17', 'f18'], type: 'Heatmap', company: 'NextGen Ltd' },
+  { id: 'r9',  name: 'Goal Completion Report',       description: 'Goal achievement rates across teams',            viewId: 'v4', fieldIds: ['f2', 'f7', 'f17', 'f19'], type: 'Metric Report', company: 'NextGen Ltd' },
+  { id: 'r10', name: 'Talent Assessment Matrix',     description: 'Performance vs potential 9-box grid',            viewId: 'v4', fieldIds: ['f2', 'f3', 'f17', 'f20'], type: 'Heatmap', company: 'Global Industries' },
 ];
 
 // ── Dashboards (4) ───────────────────────────────────────────
