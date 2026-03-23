@@ -32,7 +32,6 @@ export interface Field {
 export interface ContentUserRole {
   id: string;
   name: string;
-  description: string;
   dashboardIds: string[];
   reportIds: string[];
   viewIds: string[];

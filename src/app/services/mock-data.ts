@@ -60,7 +60,6 @@ export const MOCK_ROLES: ContentUserRole[] = [
   {
     id: 'role1',
     name: 'HR Analyst',
-    description: 'Full access to headcount and absence data',
     dashboardIds: ['d1', 'd3'],
     reportIds: ['r1', 'r2', 'r3', 'r6', 'r7'],
     viewIds: ['v1', 'v3'],
@@ -69,7 +68,6 @@ export const MOCK_ROLES: ContentUserRole[] = [
   {
     id: 'role2',
     name: 'Compensation Manager',
-    description: 'Access to compensation data with partial headcount',
     dashboardIds: ['d2'],
     reportIds: ['r4', 'r5'],
     viewIds: ['v2'],
@@ -78,7 +76,6 @@ export const MOCK_ROLES: ContentUserRole[] = [
   {
     id: 'role3',
     name: 'People Manager (Limited)',
-    description: 'Performance dashboards only — missing some field access to demonstrate warnings',
     dashboardIds: ['d4'],
     reportIds: ['r8', 'r9', 'r10'],
     viewIds: ['v4'],
