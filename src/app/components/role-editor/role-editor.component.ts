@@ -56,12 +56,6 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
                (ngModelChange)="roleName.set($event)"
                placeholder="Enter role name" class="w-full" />
       </div>
-      <div class="flex flex-col gap-1">
-        <label for="roleDesc" class="font-medium text-sm text-gray-700">Description</label>
-        <input pInputText id="roleDesc" [ngModel]="roleDescription()"
-               (ngModelChange)="roleDescription.set($event)"
-               placeholder="Enter description" class="w-full" />
-      </div>
     </div>
 
     <div class="flex gap-4">
@@ -163,7 +157,6 @@ export class RoleEditorComponent implements OnInit {
   isNew = signal(true);
   roleId = signal<string | null>(null);
   roleName = signal('');
-  roleDescription = signal('');
   selectedDashboardIds = signal<string[]>([]);
   selectedReportIds = signal<string[]>([]);
   selectedViewIds = signal<string[]>([]);
@@ -190,7 +183,6 @@ export class RoleEditorComponent implements OnInit {
         this.isNew.set(false);
         this.roleId.set(role.id);
         this.roleName.set(role.name);
-        this.roleDescription.set(role.description);
         this.selectedDashboardIds.set([...role.dashboardIds]);
         this.selectedReportIds.set([...role.reportIds]);
         this.selectedViewIds.set([...role.viewIds]);
@@ -281,7 +273,6 @@ export class RoleEditorComponent implements OnInit {
   save(): void {
     const roleData = {
       name: this.roleName(),
-      description: this.roleDescription(),
       dashboardIds: this.selectedDashboardIds(),
       reportIds: this.selectedReportIds(),
       viewIds: this.selectedViewIds(),
