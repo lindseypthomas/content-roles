@@ -22,7 +22,6 @@ import { RoleService } from '../../services/role.service';
       <ng-template #header>
         <tr>
           <th>Name</th>
-          <th>Description</th>
           <th>Dashboards</th>
           <th>Reports</th>
           <th>Views</th>
@@ -33,7 +32,6 @@ import { RoleService } from '../../services/role.service';
       <ng-template #body let-role>
         <tr>
           <td class="font-semibold">{{ role.name }}</td>
-          <td>{{ role.description }}</td>
           <td><p-tag [value]="role.dashboardIds.length + ''" severity="info" /></td>
           <td><p-tag [value]="role.reportIds.length + ''" severity="info" /></td>
           <td><p-tag [value]="role.viewIds.length + ''" severity="info" /></td>
@@ -50,7 +48,7 @@ import { RoleService } from '../../services/role.service';
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td colspan="7" class="text-center py-8 text-gray-500">
+          <td colspan="6" class="text-center py-8 text-gray-500">
             No roles defined. Click "Create Role" to get started.
           </td>
         </tr>
