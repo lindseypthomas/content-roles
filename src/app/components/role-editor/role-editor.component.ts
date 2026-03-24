@@ -14,6 +14,8 @@ import { DashboardTabComponent } from './tabs/dashboard-tab/dashboard-tab.compon
 import { ReportTabComponent } from './tabs/report-tab/report-tab.component';
 import { ViewTabComponent } from './tabs/view-tab/view-tab.component';
 import { FieldTabComponent } from './tabs/field-tab/field-tab.component';
+import { InsightsTabComponent } from './tabs/insights-tab/insights-tab.component';
+import { MetricGroupsTabComponent } from './tabs/metric-groups-tab/metric-groups-tab.component';
 import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.component';
 
 @Component({
@@ -30,6 +32,8 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
     ReportTabComponent,
     ViewTabComponent,
     FieldTabComponent,
+    InsightsTabComponent,
+    MetricGroupsTabComponent,
     DependencyPanelComponent,
   ],
   template: `
@@ -87,6 +91,12 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
                 <p-badge [value]="selectedFieldIds().length + ''" severity="info" class="ml-2" />
               }
             </p-tab>
+            <p-tab value="4">
+              Insights
+            </p-tab>
+            <p-tab value="5">
+              Metric Groups
+            </p-tab>
           </p-tablist>
           <p-tabpanels>
             <p-tabpanel value="0">
@@ -112,6 +122,12 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
                 [selectedIds]="selectedFieldIds()"
                 (selectionChange)="selectedFieldIds.set($event)"
                 [roleSelection]="currentSelection()" />
+            </p-tabpanel>
+            <p-tabpanel value="4">
+              <app-insights-tab />
+            </p-tabpanel>
+            <p-tabpanel value="5">
+              <app-metric-groups-tab />
             </p-tabpanel>
           </p-tabpanels>
         </p-tabs>
