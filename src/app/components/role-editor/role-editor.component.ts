@@ -80,22 +80,22 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
               }
             </p-tab>
             <p-tab value="2">
+              Insights
+            </p-tab>
+            <p-tab value="3">
+              Metric Groups
+            </p-tab>
+            <p-tab value="4">
               Views
               @if (selectedViewIds().length > 0) {
                 <p-badge [value]="selectedViewIds().length + ''" severity="info" class="ml-2" />
               }
             </p-tab>
-            <p-tab value="3">
+            <p-tab value="5">
               Fields
               @if (selectedFieldIds().length > 0) {
                 <p-badge [value]="selectedFieldIds().length + ''" severity="info" class="ml-2" />
               }
-            </p-tab>
-            <p-tab value="4">
-              Insights
-            </p-tab>
-            <p-tab value="5">
-              Metric Groups
             </p-tab>
           </p-tablist>
           <p-tabpanels>
@@ -112,22 +112,22 @@ import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.c
                 [roleSelection]="currentSelection()" />
             </p-tabpanel>
             <p-tabpanel value="2">
+              <app-insights-tab />
+            </p-tabpanel>
+            <p-tabpanel value="3">
+              <app-metric-groups-tab />
+            </p-tabpanel>
+            <p-tabpanel value="4">
               <app-view-tab
                 [selectedIds]="selectedViewIds()"
                 (selectionChange)="onViewChange($event)"
                 [roleSelection]="currentSelection()" />
             </p-tabpanel>
-            <p-tabpanel value="3">
+            <p-tabpanel value="5">
               <app-field-tab
                 [selectedIds]="selectedFieldIds()"
                 (selectionChange)="selectedFieldIds.set($event)"
                 [roleSelection]="currentSelection()" />
-            </p-tabpanel>
-            <p-tabpanel value="4">
-              <app-insights-tab />
-            </p-tabpanel>
-            <p-tabpanel value="5">
-              <app-metric-groups-tab />
             </p-tabpanel>
           </p-tabpanels>
         </p-tabs>
