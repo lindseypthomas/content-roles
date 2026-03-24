@@ -21,7 +21,7 @@ import { ContentItemType } from '../../models/content.models';
             <div class="mb-3">
               <h4 class="text-sm font-semibold text-gray-700 mb-2">
                 <i class="pi pi-info-circle text-blue-500 mr-1"></i>
-                "{{ group.dashboardName }}" requires:
+                "{{ group.dashboardName }}" uses:
               </h4>
 
               @if (group.missingReports.length > 0) {
