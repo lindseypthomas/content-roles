@@ -26,6 +26,8 @@ import { RoleService } from '../../services/role.service';
           <th>Reports</th>
           <th>Views</th>
           <th>Fields</th>
+          <th>Insights</th>
+          <th>Metric Groups</th>
           <th style="width: 10rem">Actions</th>
         </tr>
       </ng-template>
@@ -36,6 +38,8 @@ import { RoleService } from '../../services/role.service';
           <td><p-tag [value]="role.reportIds.length + ''" severity="info" /></td>
           <td><p-tag [value]="role.viewIds.length + ''" severity="info" /></td>
           <td><p-tag [value]="role.fieldIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.insightIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.metricGroupIds.length + ''" severity="info" /></td>
           <td>
             <div class="flex gap-2">
               <p-button icon="pi pi-pencil" [rounded]="true" [text]="true"
@@ -48,7 +52,7 @@ import { RoleService } from '../../services/role.service';
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td colspan="6" class="text-center py-8 text-gray-500">
+          <td colspan="8" class="text-center py-8 text-gray-500">
             No roles defined. Click "Create Role" to get started.
           </td>
         </tr>

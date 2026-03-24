@@ -177,6 +177,8 @@ export class RoleEditorComponent implements OnInit {
   selectedReportIds = signal<string[]>([]);
   selectedViewIds = signal<string[]>([]);
   selectedFieldIds = signal<string[]>([]);
+  selectedInsightIds = signal<string[]>([]);
+  selectedMetricGroupIds = signal<string[]>([]);
   activeTab = signal('0');
   lastAction = signal<{ type: 'add' | 'remove'; itemType: string; itemId: string } | null>(null);
 
@@ -203,6 +205,8 @@ export class RoleEditorComponent implements OnInit {
         this.selectedReportIds.set([...role.reportIds]);
         this.selectedViewIds.set([...role.viewIds]);
         this.selectedFieldIds.set([...role.fieldIds]);
+        this.selectedInsightIds.set([...role.insightIds]);
+        this.selectedMetricGroupIds.set([...role.metricGroupIds]);
       }
     }
   }
@@ -293,6 +297,8 @@ export class RoleEditorComponent implements OnInit {
       reportIds: this.selectedReportIds(),
       viewIds: this.selectedViewIds(),
       fieldIds: this.selectedFieldIds(),
+      insightIds: this.selectedInsightIds(),
+      metricGroupIds: this.selectedMetricGroupIds(),
     };
 
     if (this.isNew()) {

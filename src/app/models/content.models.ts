@@ -36,6 +36,8 @@ export interface ContentUserRole {
   reportIds: string[];
   viewIds: string[];
   fieldIds: string[];
+  insightIds: string[];
+  metricGroupIds: string[];
 }
 
 export type ContentItemType = 'dashboard' | 'report' | 'view' | 'field';

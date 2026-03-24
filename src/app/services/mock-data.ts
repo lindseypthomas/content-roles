@@ -64,6 +64,8 @@ export const MOCK_ROLES: ContentUserRole[] = [
     reportIds: ['r1', 'r2', 'r3', 'r6', 'r7'],
     viewIds: ['v1', 'v3'],
     fieldIds: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f13', 'f14', 'f15', 'f16'],
+    insightIds: ['insight1', 'insight2'],
+    metricGroupIds: ['mg1'],
   },
   {
     id: 'role2',
@@ -72,6 +74,8 @@ export const MOCK_ROLES: ContentUserRole[] = [
     reportIds: ['r4', 'r5'],
     viewIds: ['v2'],
     fieldIds: ['f1', 'f2', 'f3', 'f4', 'f8', 'f9', 'f10', 'f11', 'f12'],
+    insightIds: [],
+    metricGroupIds: ['mg2', 'mg3'],
   },
   {
     id: 'role3',
@@ -80,5 +84,7 @@ export const MOCK_ROLES: ContentUserRole[] = [
     reportIds: ['r8', 'r9', 'r10'],
     viewIds: ['v4'],
     fieldIds: ['f2', 'f3', 'f17', 'f18'],  // Missing f7, f19, f20 — will trigger warnings
+    insightIds: ['insight3'],
+    metricGroupIds: [],
   },
 ];
