@@ -17,7 +17,6 @@ import { RoleSelection } from '../../../../services/dependency.service';
           <th style="width: 3rem"></th>
           <th>Field</th>
           <th>Description</th>
-          <th>Used In Views</th>
           <th>Status</th>
         </tr>
       </ng-template>
@@ -29,11 +28,6 @@ import { RoleSelection } from '../../../../services/dependency.service';
           </td>
           <td class="font-medium">{{ row.name }}</td>
           <td class="text-gray-600 text-sm">{{ row.description }}</td>
-          <td class="text-sm">
-            @for (viewName of row.viewNames; track viewName; let last = $last) {
-              <span>{{ viewName }}{{ last ? '' : ', ' }}</span>
-            }
-          </td>
           <td>
             @if (row.selected) {
               <p-tag value="Included" severity="success" icon="pi pi-check" />
@@ -78,14 +72,11 @@ export class FieldTabComponent {
 
     return fields.map(f => {
       const isSelected = selected.includes(f.id);
-      const viewNames = f.viewIds
-        .map(vId => this.contentService.getView(vId)?.name ?? vId);
 
       return {
         id: f.id,
         name: f.name,
         description: f.description,
-        viewNames,
         selected: isSelected,
         neededBySelectedReport: !isSelected && neededFieldIds.has(f.id),
       };
