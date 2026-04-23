@@ -1,316 +1,113 @@
-import { Component, inject, signal, computed, OnInit, effect } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { TabsModule } from 'primeng/tabs';
-import { ToolbarModule } from 'primeng/toolbar';
+import { Component, inject, computed } from '@angular/core';
+import { Router } from '@angular/router';
+import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { BadgeModule } from 'primeng/badge';
-import { MessageModule } from 'primeng/message';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MenuItem } from 'primeng/api';
+import { TagModule } from 'primeng/tag';
+import { MenuModule } from 'primeng/menu';
 import { RoleService } from '../../services/role.service';
-import { DependencyService, RoleSelection } from '../../services/dependency.service';
-import { ContentUserRole, EffectiveAccess } from '../../models/content.models';
-import { DashboardTabComponent } from './tabs/dashboard-tab/dashboard-tab.component';
-import { ReportTabComponent } from './tabs/report-tab/report-tab.component';
-import { ViewTabComponent } from './tabs/view-tab/view-tab.component';
-import { FieldTabComponent } from './tabs/field-tab/field-tab.component';
-import { InsightsTabComponent } from './tabs/insights-tab/insights-tab.component';
-import { MetricGroupsTabComponent } from './tabs/metric-groups-tab/metric-groups-tab.component';
-import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.component';
 
 @Component({
-  selector: 'app-role-editor',
-  imports: [
-    FormsModule,
-    TabsModule,
-    ToolbarModule,
-    ButtonModule,
-    InputTextModule,
-    BadgeModule,
-    MessageModule,
-    DashboardTabComponent,
-    ReportTabComponent,
-    ViewTabComponent,
-    FieldTabComponent,
-    InsightsTabComponent,
-    MetricGroupsTabComponent,
-    DependencyPanelComponent,
-  ],
+  selector: 'app-role-list',
+  imports: [TableModule, ButtonModule, ConfirmDialogModule, TagModule, MenuModule],
+  providers: [ConfirmationService],
   template: `
-    <p-toolbar>
-      <ng-template #start>
-        <h2 class="text-xl font-semibold text-gray-800 mr-4">
-          {{ isNew() ? 'Create Role' : 'Edit Role' }}
-        </h2>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800">Content User Roles</h2>
+      <p-button label="Add new role" icon="pi pi-plus" (onClick)="createRole()" />
+    </div>
+
+    <p-table [value]="roles()" [tableStyle]="{ 'min-width': '70rem' }"
+             stripedRows styleClass="p-datatable-sm">
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Dashboards</th>
+          <th>Reports</th>
+          <th>Heatmaps</th>
+          <th>Metric Tiles</th>
+          <th>Insights</th>
+          <th>Metric Groups</th>
+          <th>Views</th>
+          <th>Fields</th>
+          <th style="width: 6rem">Actions</th>
+        </tr>
       </ng-template>
-      <ng-template #end>
-        <div class="flex gap-2">
-          <p-button label="Cancel" severity="secondary" [outlined]="true"
-                    icon="pi pi-times" (onClick)="cancel()" />
-          <p-button label="Save" icon="pi pi-check" (onClick)="save()"
-                    [disabled]="!roleName()" />
-        </div>
+      <ng-template #body let-role>
+        <tr>
+          <td class="font-semibold">{{ role.name }}</td>
+          <td><p-tag [value]="role.dashboardIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.reportIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="(role.heatmapIds?.length || 0) + ''" severity="info" /></td>
+          <td><p-tag [value]="(role.metricTileIds?.length || 0) + ''" severity="info" /></td>
+          <td><p-tag [value]="role.insightIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.metricGroupIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.viewIds.length + ''" severity="info" /></td>
+          <td><p-tag [value]="role.fieldIds.length + ''" severity="info" /></td>
+          <td>
+            <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true"
+                      severity="secondary" (onClick)="openMenu($event, menu, role)"
+                      aria-label="Actions" />
+            <p-menu #menu [model]="menuItems" [popup]="true" appendTo="body" />
+          </td>
+        </tr>
       </ng-template>
-    </p-toolbar>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="10" class="text-center py-8 text-gray-500">
+            No roles defined. Click "Add new role" to get started.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-4">
-      <div class="flex flex-col gap-1">
-        <label for="roleName" class="font-medium text-sm text-gray-700">Role Name</label>
-        <input pInputText id="roleName" [ngModel]="roleName()"
-               (ngModelChange)="roleName.set($event)"
-               placeholder="Enter role name" class="w-full" />
-      </div>
-    </div>
-
-    <div class="flex gap-4">
-      <!-- Main content area with tabs -->
-      <div class="flex-1 min-w-0">
-        <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($event + '')">
-          <p-tablist>
-            <p-tab value="0">
-              Dashboards
-              @if (selectedDashboardIds().length > 0) {
-                <p-badge [value]="selectedDashboardIds().length + ''" severity="info" class="ml-2" />
-              }
-            </p-tab>
-            <p-tab value="1">
-              Reports
-              @if (selectedReportIds().length > 0) {
-                <p-badge [value]="selectedReportIds().length + ''" severity="info" class="ml-2" />
-              }
-            </p-tab>
-            <p-tab value="2">
-              Insights
-            </p-tab>
-            <p-tab value="3">
-              Metric Groups
-            </p-tab>
-            <p-tab value="4">
-              Views
-              @if (selectedViewIds().length > 0) {
-                <p-badge [value]="selectedViewIds().length + ''" severity="info" class="ml-2" />
-              }
-            </p-tab>
-            <p-tab value="5">
-              Fields
-              @if (selectedFieldIds().length > 0) {
-                <p-badge [value]="selectedFieldIds().length + ''" severity="info" class="ml-2" />
-              }
-            </p-tab>
-          </p-tablist>
-          <p-tabpanels>
-            <p-tabpanel value="0">
-              <app-dashboard-tab
-                [selectedIds]="selectedDashboardIds()"
-                (selectionChange)="onDashboardChange($event)"
-                [roleSelection]="currentSelection()" />
-            </p-tabpanel>
-            <p-tabpanel value="1">
-              <app-report-tab
-                [selectedIds]="selectedReportIds()"
-                (selectionChange)="onReportChange($event)"
-                [roleSelection]="currentSelection()" />
-            </p-tabpanel>
-            <p-tabpanel value="2">
-              <app-insights-tab />
-            </p-tabpanel>
-            <p-tabpanel value="3">
-              <app-metric-groups-tab />
-            </p-tabpanel>
-            <p-tabpanel value="4">
-              <app-view-tab
-                [selectedIds]="selectedViewIds()"
-                (selectionChange)="onViewChange($event)"
-                [roleSelection]="currentSelection()" />
-            </p-tabpanel>
-            <p-tabpanel value="5">
-              <app-field-tab
-                [selectedIds]="selectedFieldIds()"
-                (selectionChange)="selectedFieldIds.set($event)"
-                [roleSelection]="currentSelection()" />
-            </p-tabpanel>
-          </p-tabpanels>
-        </p-tabs>
-      </div>
-
-      <!-- Dependency panel -->
-      <div class="w-96 shrink-0">
-        <app-dependency-panel
-          [roleSelection]="currentSelection()"
-          [lastAction]="lastAction()"
-          (addItems)="onAddItems($event)"
-          (removeItems)="onRemoveItems($event)"
-          (removeConfirmed)="onRemoveConfirmed($event)" />
-      </div>
-    </div>
-
-    <!-- Effective Access Summary Footer -->
-    <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-      <h3 class="text-sm font-semibold text-gray-600 mb-2">Effective Access Summary</h3>
-      <div class="flex flex-wrap gap-4 text-sm">
-        @for (dash of effectiveAccess().dashboards; track dash.id) {
-          <div class="flex items-center gap-1">
-            <i class="pi" [class]="dash.fullyVisible ? 'pi-check-circle text-green-600' : 'pi-exclamation-circle text-amber-500'"></i>
-            <span>{{ dash.name }}: {{ dash.visibleReportCount }}/{{ dash.totalReportCount }} reports visible</span>
-          </div>
-        }
-        @if (effectiveAccess().dashboards.length === 0 && selectedDashboardIds().length === 0) {
-          <span class="text-gray-400">No dashboards selected</span>
-        }
-        <div class="ml-auto font-medium">
-          Total: {{ effectiveAccess().visibleReports }}/{{ effectiveAccess().totalReports }} reports fully visible
-        </div>
-      </div>
-    </div>
+    <p-confirmDialog />
   `,
 })
-export class RoleEditorComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+export class RoleListComponent {
   private router = inject(Router);
   private roleService = inject(RoleService);
-  private dependencyService = inject(DependencyService);
+  private confirmationService = inject(ConfirmationService);
 
-  isNew = signal(true);
-  roleId = signal<string | null>(null);
-  roleName = signal('');
-  selectedDashboardIds = signal<string[]>([]);
-  selectedReportIds = signal<string[]>([]);
-  selectedViewIds = signal<string[]>([]);
-  selectedFieldIds = signal<string[]>([]);
-  selectedInsightIds = signal<string[]>([]);
-  selectedMetricGroupIds = signal<string[]>([]);
-  activeTab = signal('0');
-  lastAction = signal<{ type: 'add' | 'remove'; itemType: string; itemId: string } | null>(null);
+  roles = computed(() => this.roleService.roles());
 
-  currentSelection = computed<RoleSelection>(() => ({
-    dashboardIds: this.selectedDashboardIds(),
-    reportIds: this.selectedReportIds(),
-    viewIds: this.selectedViewIds(),
-    fieldIds: this.selectedFieldIds(),
-  }));
+  menuItems: MenuItem[] = [];
 
-  effectiveAccess = computed<EffectiveAccess>(() =>
-    this.dependencyService.getEffectiveAccess(this.currentSelection())
-  );
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      const role = this.roleService.getRole(id);
-      if (role) {
-        this.isNew.set(false);
-        this.roleId.set(role.id);
-        this.roleName.set(role.name);
-        this.selectedDashboardIds.set([...role.dashboardIds]);
-        this.selectedReportIds.set([...role.reportIds]);
-        this.selectedViewIds.set([...role.viewIds]);
-        this.selectedFieldIds.set([...role.fieldIds]);
-        this.selectedInsightIds.set([...role.insightIds]);
-        this.selectedMetricGroupIds.set([...role.metricGroupIds]);
-      }
-    }
+  createRole(): void {
+    this.router.navigate(['/roles/new']);
   }
 
-  onDashboardChange(event: { ids: string[]; added?: string; removed?: string }): void {
-    this.selectedDashboardIds.set(event.ids);
-    if (event.added) {
-      this.lastAction.set({ type: 'add', itemType: 'dashboard', itemId: event.added });
-    } else if (event.removed) {
-      this.lastAction.set({ type: 'remove', itemType: 'dashboard', itemId: event.removed });
-    }
+  editRole(id: string): void {
+    this.router.navigate(['/roles', id, 'edit']);
   }
 
-  onReportChange(event: { ids: string[]; added?: string; removed?: string }): void {
-    this.selectedReportIds.set(event.ids);
-    if (event.added) {
-      this.lastAction.set({ type: 'add', itemType: 'report', itemId: event.added });
-    } else if (event.removed) {
-      this.lastAction.set({ type: 'remove', itemType: 'report', itemId: event.removed });
-    }
+  openMenu(event: Event, menu: any, role: { id: string; name: string }): void {
+    this.menuItems = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.editRole(role.id),
+      },
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        styleClass: 'text-red-600',
+        command: () => this.confirmDelete(role),
+      },
+    ];
+    menu.toggle(event);
   }
 
-  onViewChange(event: { ids: string[]; added?: string; removed?: string }): void {
-    this.selectedViewIds.set(event.ids);
-    if (event.added) {
-      this.lastAction.set({ type: 'add', itemType: 'view', itemId: event.added });
-    } else if (event.removed) {
-      this.lastAction.set({ type: 'remove', itemType: 'view', itemId: event.removed });
-    }
-  }
-
-  onAddItems(event: { type: string; ids: string[] }): void {
-    switch (event.type) {
-      case 'report':
-        this.selectedReportIds.update(ids => [...new Set([...ids, ...event.ids])]);
-        break;
-      case 'view':
-        this.selectedViewIds.update(ids => [...new Set([...ids, ...event.ids])]);
-        break;
-      case 'field':
-        this.selectedFieldIds.update(ids => [...new Set([...ids, ...event.ids])]);
-        break;
-      case 'dashboard':
-        this.selectedDashboardIds.update(ids => [...new Set([...ids, ...event.ids])]);
-        break;
-    }
-  }
-
-  onRemoveItems(event: { type: string; ids: string[] }): void {
-    const idsToRemove = new Set(event.ids);
-    switch (event.type) {
-      case 'report':
-        this.selectedReportIds.update(ids => ids.filter(i => !idsToRemove.has(i)));
-        break;
-      case 'view':
-        this.selectedViewIds.update(ids => ids.filter(i => !idsToRemove.has(i)));
-        break;
-      case 'field':
-        this.selectedFieldIds.update(ids => ids.filter(i => !idsToRemove.has(i)));
-        break;
-      case 'dashboard':
-        this.selectedDashboardIds.update(ids => ids.filter(i => !idsToRemove.has(i)));
-        break;
-    }
-  }
-
-  onRemoveConfirmed(event: { type: string; id: string }): void {
-    switch (event.type) {
-      case 'dashboard':
-        this.selectedDashboardIds.update(ids => ids.filter(i => i !== event.id));
-        break;
-      case 'report':
-        this.selectedReportIds.update(ids => ids.filter(i => i !== event.id));
-        break;
-      case 'view':
-        this.selectedViewIds.update(ids => ids.filter(i => i !== event.id));
-        break;
-      case 'field':
-        this.selectedFieldIds.update(ids => ids.filter(i => i !== event.id));
-        break;
-    }
-  }
-
-  save(): void {
-    const roleData = {
-      name: this.roleName(),
-      dashboardIds: this.selectedDashboardIds(),
-      reportIds: this.selectedReportIds(),
-      viewIds: this.selectedViewIds(),
-      fieldIds: this.selectedFieldIds(),
-      insightIds: this.selectedInsightIds(),
-      metricGroupIds: this.selectedMetricGroupIds(),
-    };
-
-    if (this.isNew()) {
-      this.roleService.createRole(roleData);
-    } else {
-      this.roleService.updateRole({ id: this.roleId()!, ...roleData });
-    }
-
-    this.router.navigate(['/roles']);
-  }
-
-  cancel(): void {
-    this.router.navigate(['/roles']);
+  confirmDelete(role: { id: string; name: string }): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete "${role.name}"?`,
+      header: 'Delete Role',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.roleService.deleteRole(role.id);
+      },
+    });
   }
 }
