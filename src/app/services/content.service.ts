@@ -1,11 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Dashboard, Report, View, Field } from '../models/content.models';
-import { MOCK_DASHBOARDS, MOCK_REPORTS, MOCK_VIEWS, MOCK_FIELDS } from './mock-data';
+import { Dashboard, Report, Heatmap, MetricTile, View, Field } from '../models/content.models';
+import {
+  MOCK_DASHBOARDS,
+  MOCK_REPORTS,
+  MOCK_HEATMAPS,
+  MOCK_METRIC_TILES,
+  MOCK_VIEWS,
+  MOCK_FIELDS,
+} from './mock-data';
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
   private dashboards: Dashboard[] = MOCK_DASHBOARDS;
   private reports: Report[] = MOCK_REPORTS;
+  private heatmaps: Heatmap[] = MOCK_HEATMAPS;
+  private metricTiles: MetricTile[] = MOCK_METRIC_TILES;
   private views: View[] = MOCK_VIEWS;
   private fields: Field[] = MOCK_FIELDS;
 
@@ -15,6 +24,14 @@ export class ContentService {
 
   getReports(): Report[] {
     return this.reports;
+  }
+
+  getHeatmaps(): Heatmap[] {
+    return this.heatmaps;
+  }
+
+  getMetricTiles(): MetricTile[] {
+    return this.metricTiles;
   }
 
   getViews(): View[] {
@@ -31,6 +48,14 @@ export class ContentService {
 
   getReport(id: string): Report | undefined {
     return this.reports.find(r => r.id === id);
+  }
+
+  getHeatmap(id: string): Heatmap | undefined {
+    return this.heatmaps.find(h => h.id === id);
+  }
+
+  getMetricTile(id: string): MetricTile | undefined {
+    return this.metricTiles.find(m => m.id === id);
   }
 
   getView(id: string): View | undefined {
