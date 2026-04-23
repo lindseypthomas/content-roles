@@ -1,113 +1,80 @@
-import { Component, inject, computed } from '@angular/core';
-import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { TabsModule } from 'primeng/tabs';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService, MenuItem } from 'primeng/api';
-import { TagModule } from 'primeng/tag';
-import { MenuModule } from 'primeng/menu';
+import { InputTextModule } from 'primeng/inputtext';
+import { BadgeModule } from 'primeng/badge';
+import { MessageModule } from 'primeng/message';
 import { RoleService } from '../../services/role.service';
+import { DependencyService, RoleSelection } from '../../services/dependency.service';
+import { ContentUserRole } from '../../models/content.models';
+import { DashboardTabComponent } from './tabs/dashboard-tab/dashboard-tab.component';
+import { ReportTabComponent } from './tabs/report-tab/report-tab.component';
+import { ViewTabComponent } from './tabs/view-tab/view-tab.component';
+import { FieldTabComponent } from './tabs/field-tab/field-tab.component';
+import { InsightsTabComponent } from './tabs/insights-tab/insights-tab.component';
+import { MetricGroupsTabComponent } from './tabs/metric-groups-tab/metric-groups-tab.component';
+import { HeatmapsTabComponent } from './tabs/heatmaps-tab/heatmaps-tab.component';
+import { MetricTilesTabComponent } from './tabs/metric-tiles-tab/metric-tiles-tab.component';
+import { DependencyPanelComponent } from '../dependency-panel/dependency-panel.component';
 
 @Component({
-  selector: 'app-role-list',
-  imports: [TableModule, ButtonModule, ConfirmDialogModule, TagModule, MenuModule],
-  providers: [ConfirmationService],
+  selector: 'app-role-editor',
+  imports: [
+    FormsModule,
+    TabsModule,
+    ToolbarModule,
+    ButtonModule,
+    InputTextModule,
+    BadgeModule,
+    MessageModule,
+    DashboardTabComponent,
+    ReportTabComponent,
+    HeatmapsTabComponent,
+    MetricTilesTabComponent,
+    ViewTabComponent,
+    FieldTabComponent,
+    InsightsTabComponent,
+    MetricGroupsTabComponent,
+    DependencyPanelComponent,
+  ],
   template: `
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-semibold text-gray-800">Content User Roles</h2>
-      <p-button label="Add new role" icon="pi pi-plus" (onClick)="createRole()" />
+    <p-toolbar>
+      <ng-template #start>
+        <h2 class="text-xl font-semibold text-gray-800 mr-4">
+          {{ isNew() ? 'Add new role' : 'Edit Role' }}
+        </h2>
+      </ng-template>
+      <ng-template #end>
+        <div class="flex gap-2">
+          <p-button label="Cancel" severity="secondary" [outlined]="true"
+                    icon="pi pi-times" (onClick)="cancel()" />
+          <p-button label="Save" icon="pi pi-check" (onClick)="save()"
+                    [disabled]="!roleName()" />
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-4">
+      <div class="flex flex-col gap-1">
+        <label for="roleName" class="font-medium text-sm text-gray-700">Role Name</label>
+        <input pInputText id="roleName" [ngModel]="roleName()"
+               (ngModelChange)="roleName.set($event)"
+               placeholder="Enter role name" class="w-full" />
+      </div>
     </div>
 
-    <p-table [value]="roles()" [tableStyle]="{ 'min-width': '70rem' }"
-             stripedRows styleClass="p-datatable-sm">
-      <ng-template #header>
-        <tr>
-          <th>Name</th>
-          <th>Dashboards</th>
-          <th>Reports</th>
-          <th>Heatmaps</th>
-          <th>Metric Tiles</th>
-          <th>Insights</th>
-          <th>Metric Groups</th>
-          <th>Views</th>
-          <th>Fields</th>
-          <th style="width: 6rem">Actions</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-role>
-        <tr>
-          <td class="font-semibold">{{ role.name }}</td>
-          <td><p-tag [value]="role.dashboardIds.length + ''" severity="info" /></td>
-          <td><p-tag [value]="role.reportIds.length + ''" severity="info" /></td>
-          <td><p-tag [value]="(role.heatmapIds?.length || 0) + ''" severity="info" /></td>
-          <td><p-tag [value]="(role.metricTileIds?.length || 0) + ''" severity="info" /></td>
-          <td><p-tag [value]="role.insightIds.length + ''" severity="info" /></td>
-          <td><p-tag [value]="role.metricGroupIds.length + ''" severity="info" /></td>
-          <td><p-tag [value]="role.viewIds.length + ''" severity="info" /></td>
-          <td><p-tag [value]="role.fieldIds.length + ''" severity="info" /></td>
-          <td>
-            <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true"
-                      severity="secondary" (onClick)="openMenu($event, menu, role)"
-                      aria-label="Actions" />
-            <p-menu #menu [model]="menuItems" [popup]="true" appendTo="body" />
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="10" class="text-center py-8 text-gray-500">
-            No roles defined. Click "Add new role" to get started.
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-
-    <p-confirmDialog />
-  `,
-})
-export class RoleListComponent {
-  private router = inject(Router);
-  private roleService = inject(RoleService);
-  private confirmationService = inject(ConfirmationService);
-
-  roles = computed(() => this.roleService.roles());
-
-  menuItems: MenuItem[] = [];
-
-  createRole(): void {
-    this.router.navigate(['/roles/new']);
-  }
-
-  editRole(id: string): void {
-    this.router.navigate(['/roles', id, 'edit']);
-  }
-
-  openMenu(event: Event, menu: any, role: { id: string; name: string }): void {
-    this.menuItems = [
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: () => this.editRole(role.id),
-      },
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        styleClass: 'text-red-600',
-        command: () => this.confirmDelete(role),
-      },
-    ];
-    menu.toggle(event);
-  }
-
-  confirmDelete(role: { id: string; name: string }): void {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${role.name}"?`,
-      header: 'Delete Role',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        this.roleService.deleteRole(role.id);
-      },
-    });
-  }
-}
+    <div class="flex gap-4">
+      <!-- Main content area with tabs -->
+      <div class="flex-1 min-w-0">
+        <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($event + '')">
+          <p-tablist>
+            <p-tab value="0">
+              Dashboards
+              @if (selectedDashboardIds().length > 0) {
+                <p-badge [value]="selectedDashboardIds().length + ''" severity="info" class="ml-2" />
+              }
+            </p-tab>
+            <p
