@@ -11,7 +11,25 @@ export interface Report {
   description: string;
   viewId: string;
   fieldIds: string[];
-  type: 'Metric Report' | 'Metric Tile' | 'Heatmap' | 'Report';
+  type: 'Metric Report' | 'Report';
+  company: string;
+}
+
+export interface Heatmap {
+  id: string;
+  name: string;
+  description: string;
+  viewId: string;
+  fieldIds: string[];
+  company: string;
+}
+
+export interface MetricTile {
+  id: string;
+  name: string;
+  description: string;
+  viewId: string;
+  fieldIds: string[];
   company: string;
 }
 
@@ -34,6 +52,8 @@ export interface ContentUserRole {
   name: string;
   dashboardIds: string[];
   reportIds: string[];
+  heatmapIds: string[];
+  metricTileIds: string[];
   viewIds: string[];
   fieldIds: string[];
   insightIds: string[];
@@ -61,10 +81,4 @@ export interface RemovalImpact {
   affectedReports: { id: string; name: string }[];
   affectedViews: { id: string; name: string }[];
   description: string;
-}
-
-export interface EffectiveAccess {
-  dashboards: { id: string; name: string; fullyVisible: boolean; visibleReportCount: number; totalReportCount: number }[];
-  visibleReports: number;
-  totalReports: number;
 }
